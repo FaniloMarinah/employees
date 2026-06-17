@@ -17,7 +17,7 @@
         <?php for ($i=0; $i < count($departments); $i++) { ?>
             <tr>
                 <td><?php echo $departments[$i]['dept_no']; ?></td>
-                <td><?php echo $departments[$i]['dept_name']; ?></td>
+                <td><a href="liste_emp.php?id_dept=<?php echo $departments[$i]['dept_no']; ?>"><?php echo $departments[$i]['dept_name']; ?></a></td>
                 <td><?php echo $departments[$i]['last_name'] . " " . $departments[$i]['first_name']; ?></td>
             </tr>
         <?php   }?>
