@@ -61,4 +61,81 @@ mysqli_free_result($resultat);
 return $tableau;
 }
 
+function min_max(){
+    $sql="SELECT MIN(TIMESTAMPDIFF(YEAR,birth_date,CURDATE())) AS age_min,
+    MAX(TIMESTAMPDIFF(YEAR,birth_date,CURDATE())) AS age_max FROM employees";
+    $resultat=mysqli_query(dbconnect(),$sql);
+    $donne=mysqli_fetch_assoc($resultat);
+mysqli_free_result($resultat);
+return $donne;
+}
+
+function rechercherEmployes($departement, $nom, $age_min, $age_max) {
+    $conn = dbconnect();
+
+    $sql = "SELECT e.*, d.dept_name,
+                TIMESTAMPDIFF(YEAR, e.birth_date, CURDATE()) AS age
+            FROM employees e
+            LEFT JOIN dept_emp de ON e.emp_no = de.emp_no
+            LEFT JOIN departments d ON de.dept_no = d.dept_no
+            WHERE 1=1";
+
+    $params = [];
+    $types  = "";
+
+    if (!empty($departement)) {
+        $sql     .= " AND d.dept_name LIKE ?";
+        $params[] = "%$departement%";
+        $types   .= "s";
+    }
+
+    if (!empty($nom)) {
+        $mots       = explode(" ", trim($nom));
+        $conditions = [];
+
+        foreach ($mots as $mot) {
+            $motRecherche  = "%$mot%";
+            $conditions[]  = "(e.first_name LIKE ? OR e.last_name LIKE ?)";
+            $params[]      = $motRecherche;
+            $params[]      = $motRecherche;
+            $types        .= "ss";
+        }
+
+        $sql .= " AND (" . implode(" AND ", $conditions) . ")";
+    }
+
+    if (!empty($age_min) && !empty($age_max)) {
+        $sql     .= " AND TIMESTAMPDIFF(YEAR, e.birth_date, CURDATE()) BETWEEN ? AND ?";
+        $params[] = (int)$age_min;
+        $params[] = (int)$age_max;
+        $types   .= "ii";
+
+    } elseif (!empty($age_min)) {
+        $sql     .= " AND TIMESTAMPDIFF(YEAR, e.birth_date, CURDATE()) >= ?";
+        $params[] = (int)$age_min;
+        $types   .= "i";
+
+    } elseif (!empty($age_max)) {
+        $sql     .= " AND TIMESTAMPDIFF(YEAR, e.birth_date, CURDATE()) <= ?";
+        $params[] = (int)$age_max;
+        $types   .= "i";
+    }
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+
+    mysqli_stmt_execute($stmt);
+    $resultat = mysqli_stmt_get_result($stmt);
+
+    $tableau = [];
+    while ($donne = mysqli_fetch_assoc($resultat)) {
+        $tableau[] = $donne;
+    }
+
+    mysqli_free_result($resultat);
+    return $tableau;
+}
 ?>
