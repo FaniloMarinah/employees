@@ -25,10 +25,11 @@ mysqli_free_result($resultat);
 return $tableau;
 }
 
-function liste_emp($id_emp){
+function liste_emp($id_emp,$offset,$page){
     $sql="SELECT e.last_name,e.first_name,e.emp_no FROM departments as 
     dept JOIN dept_emp as dept_e ON dept.dept_no=dept_e.dept_no 
-    JOIN employees as e ON e.emp_no=dept_e.emp_no WHERE dept.dept_no= '%s' AND dept_e.to_date = '9999-01-01'";
+    JOIN employees as e ON e.emp_no=dept_e.emp_no WHERE dept.dept_no= '%s' AND dept_e.to_date = '9999-01-01' 
+    LIMIT $offset , $page";
     $sql=sprintf($sql, $id_emp);
     $resultat=mysqli_query(dbconnect(),$sql);
     $tableau=array();
