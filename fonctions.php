@@ -39,4 +39,26 @@ mysqli_free_result($resultat);
 return $tableau;
 }
 
+function fiche_emp($id_emp){
+    $sql="SELECT * FROM employees AS e WHERE e.emp_no = %d";
+    $sql=sprintf($sql, $id_emp);
+    $resultat=mysqli_query(dbconnect(),$sql);
+    $donne=mysqli_fetch_assoc($resultat);
+mysqli_free_result($resultat);
+return $donne;
+}
+
+function post_salaries($id_emp){
+    $sql="SELECT t.title,t.from_date,t.to_date,s.salary FROM
+    titles AS t JOIN salaries AS s ON t.emp_no=s.emp_no WHERE t.emp_no = %d";
+    $sql=sprintf($sql, $id_emp);
+    $resultat=mysqli_query(dbconnect(),$sql);
+    $tableau=array();
+    while ($donne=mysqli_fetch_assoc($resultat)) {
+        $tableau[]=$donne;
+    }
+mysqli_free_result($resultat);
+return $tableau;
+}
+
 ?>

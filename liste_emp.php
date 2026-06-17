@@ -13,7 +13,7 @@ $liste_e=liste_emp($id_emp);
 <body>
     <ul>
         <?php for ($i=0; $i < count($liste_e); $i++) { ?>
-            <li><?php echo $liste_e[$i]['last_name'] . ' ' . $liste_e[$i]['first_name']?></li>
+            <li><a href="fiche_emp.php?id_emp=<?php echo $liste_e[$i]['emp_no'] ?>"><?php echo $liste_e[$i]['last_name'] . ' ' . $liste_e[$i]['first_name']?></a></li>
         <?php    } ?>
     </ul>
 </body>
